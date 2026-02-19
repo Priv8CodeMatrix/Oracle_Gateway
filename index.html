@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ORACLE_GATEWAY // MACHINE-CITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+      
+      body {
+        font-family: 'Share Tech Mono', monospace;
+        background-color: #050505;
+        color: #00FF41;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin: 0;
+        cursor: crosshair; /* Global tactical cursor */
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #020202; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #00FF41; 
+        border-radius: 0;
+      }
+
+      /* CRT Post-Processing */
+      .scanlines {
+        background: linear-gradient(
+          to bottom,
+          rgba(0,0,0,0) 50%,
+          rgba(0,0,0,0.4) 50%
+        );
+        background-size: 100% 3px;
+        position: fixed;
+        inset: 0;
+        z-index: 99;
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      .vignette {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.9) 100%);
+        z-index: 98;
+        pointer-events: none;
+      }
+
+      /* --- SCHIZO UI / INTERNET CORE INTERACTION --- */
+
+      /* 1. Jitter Animation */
+      @keyframes schizo-jitter {
+        0% { transform: translate(0,0); }
+        25% { transform: translate(-2px, 2px); }
+        50% { transform: translate(2px, -2px); }
+        75% { transform: translate(-2px, -2px); }
+        100% { transform: translate(0,0); }
+      }
+
+      /* 2. Text Reveal / Glitch Hover */
+      .schizo-text {
+        position: relative;
+        transition: all 0.1s;
+      }
+      .schizo-text:hover {
+        background-color: #00FF41;
+        color: #000;
+        box-shadow: 4px 4px 0px rgba(255, 0, 0, 0.5); /* Anaglyph shadow */
+        cursor: help;
+      }
+      
+      /* 3. "Raw Data" Tooltip on Hover */
+      .data-tooltip {
+        position: relative;
+      }
+      .data-tooltip:hover::after {
+        content: attr(data-sys-code);
+        position: absolute;
+        top: -1.5em;
+        left: 0;
+        background: #000;
+        border: 1px solid #00FF41;
+        color: #00FF41;
+        font-size: 0.7em;
+        padding: 2px 4px;
+        z-index: 100;
+        white-space: nowrap;
+        pointer-events: none;
+        box-shadow: 2px 2px 0px #00FF41;
+      }
+
+      /* 4. Button Hazard Hover - CALMED DOWN */
+      .hazard-btn:hover {
+        /* No scaling, no shaking. Just raw texture change. */
+        background-image: repeating-linear-gradient(
+          45deg,
+          #00FF41,
+          #00FF41 5px,
+          #000 5px,
+          #000 10px
+        );
+        color: #fff;
+        text-shadow: 1px 1px #000;
+        border-color: #fff;
+        cursor: pointer;
+      }
+
+      /* 5. Target HUD (For Oracle Status) - SNAPS INWARDS */
+      .target-hud {
+        position: relative;
+        cursor: crosshair;
+        transition: all 0.1s ease-in;
+        display: inline-block;
+      }
+      
+      /* Corner brackets start expanded and invisible */
+      .target-hud::before, .target-hud::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border: 2px solid #FF003C; /* Hostile Red */
+        opacity: 0;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Snap effect */
+        pointer-events: none;
+      }
+
+      /* Top Left & Bottom Right Corners (Start offset further out) */
+      .target-hud::before {
+        top: -10px;
+        left: -10px;
+        border-right: none;
+        border-bottom: none;
+      }
+      .target-hud::after {
+        bottom: -10px;
+        right: -10px;
+        border-left: none;
+        border-top: none;
+      }
+
+      /* Hover States */
+      .target-hud:hover {
+        color: #FF003C;
+        background: rgba(255, 0, 60, 0.1);
+        border-color: #FF003C;
+        /* Tracking text expansion */
+        letter-spacing: 0.1em; 
+      }
+      
+      /* On Hover: Snap brackets TIGHT to the element */
+      .target-hud:hover::before {
+        opacity: 1;
+        top: -4px;
+        left: -4px;
+      }
+      .target-hud:hover::after {
+        opacity: 1;
+        bottom: -4px;
+        right: -4px;
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+  </body>
+</html>
