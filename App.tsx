@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import HexMemoryMap from './components/MatrixRain';
 import OracleSigil from './components/OracleSigil';
 import TerminalLog, { LogEntry } from './components/TerminalLog';
 
 const App: React.FC = () => {
   const [uplinkStatus, setUplinkStatus] = useState<'IDLE' | 'INITIATED' | 'CONNECTED'>('IDLE');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [logs, setLogs] = useState<LogEntry[]>([]);
-
-  // Protocol 1: Silent Handshake (Background)
-  useEffect(() => {
-    fetch('http://127.0.0.1:5000/join', { mode: 'no-cors' }).catch(() => {});
-  }, []);
 
   const handleUplink = () => {
     setUplinkStatus('INITIATED');
-    // Simulation of handshake before redirect
+    
+    // Animation sequence before redirect
     setTimeout(() => {
       setUplinkStatus('CONNECTED');
       setTimeout(() => {
-        window.location.href = 'http://127.0.0.1:5000/join';
+        // Redirect to Discord OAuth2
+        window.location.href = 'https://discord.com/oauth2/authorize?client_id=1473460235325669577&response_type=code&redirect_uri=http%3A%2F%2F76.13.140.240%3A8080%2Fcallback&scope=identify+guilds.join';
       }, 1000);
     }, 1500);
   };
@@ -47,7 +45,7 @@ const App: React.FC = () => {
               className="text-xs font-bold bg-[#00FF41] text-black px-2 py-1 mb-1 data-tooltip hover:invert transition-all"
               data-sys-code="BUILD_VERIFIED"
             >
-              v5.0.3
+              v5.0.4
             </span>
           </div>
           
