@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import HexMemoryMap from './components/MatrixRain';
 import OracleSigil from './components/OracleSigil';
-import TerminalLog, { LogEntry } from './components/TerminalLog';
+import TerminalLog from './components/TerminalLog';
 
 const App: React.FC = () => {
   const [uplinkStatus, setUplinkStatus] = useState<'IDLE' | 'INITIATED' | 'CONNECTED'>('IDLE');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [logs, setLogs] = useState<LogEntry[]>([]);
 
   const handleUplink = () => {
     setUplinkStatus('INITIATED');
@@ -161,28 +159,16 @@ const App: React.FC = () => {
           
           <div className="text-center text-xs text-[#00FF41]/50 uppercase tracking-widest flex flex-col gap-1">
             <span className="hover:text-white cursor-crosshair">Secure Connection Required</span>
-            <span className="hover:text-red-500 cursor-alias">TLS 1.3 / Port 5000 / NO_LOGS</span>
+            <span className="hover:text-red-500 cursor-alias">TLS 1.3 / Port 8080 / NO_LOGS</span>
           </div>
         </section>
 
         {/* Divider */}
         <hr className="border-[#00FF41]/20 border-dashed hover:border-solid hover:border-white transition-all max-w-3xl mx-auto w-full" />
 
-        {/* Real Data Log Area */}
-        <section className="group max-w-3xl mx-auto w-full">
-          <div className="flex items-center justify-between mb-4">
-            <h3 
-              className="text-xl font-bold uppercase tracking-widest data-tooltip w-fit hover:bg-[#00FF41] hover:text-black px-1"
-              data-sys-code="MONITORING_ACTIVE"
-            >
-              System_Stream
-            </h3>
-            <span className="text-xs animate-pulse text-[#FFB000] group-hover:text-red-500">● LIVE</span>
-          </div>
-          
-          <div className="bg-black/80 border border-[#00FF41]/30 p-4 min-h-[200px] hover:border-white/50 transition-colors">
-            <TerminalLog logs={logs} />
-          </div>
+        {/* Real Data Log Area - SYSTEM STREAM */}
+        <section className="w-full px-2">
+            <TerminalLog />
         </section>
 
         {/* Footer */}
