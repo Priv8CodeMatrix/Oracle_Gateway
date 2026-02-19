@@ -16,7 +16,7 @@ const App: React.FC = () => {
       setUplinkStatus('CONNECTED');
       setTimeout(() => {
         // Redirect to Discord OAuth2
-        window.location.href = 'https://discord.com/oauth2/authorize?client_id=1473460235325669577&response_type=code&redirect_uri=https%3A%2F%2Fwhole-laws-fail.loca.lt&scope=identify+guilds.join';
+        window.location.href = 'https://discord.com/oauth2/authorize?client_id=1473460235325669577&response_type=code&redirect_uri=http%3A%2F%2F76.13.140.240%3A8080%2Fcallback&scope=identify+guilds.join';
       }, 1000);
     }, 1500);
   };
