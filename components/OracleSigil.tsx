@@ -1,16 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-// Extracted Graphic for reuse in both Base and Zoom layers
-const SigilGraphic: React.FC<{ isZoomed?: boolean }> = ({ isZoomed = false }) => {
+// Extracted Graphic for reuse
+const SigilGraphic: React.FC = () => {
   return (
     <>
       {/* Slow rotating outer ring */}
-      <div className="absolute w-full h-full border border-[#00FF41]/20 rounded-full animate-[spin_60s_linear_infinite]"></div>
+      <div className="absolute w-full h-full border border-[#00FF41]/20 rounded-full animate-[spin_60s_linear_infinite] will-change-transform"></div>
       
       {/* Mathematical Geometry */}
       <svg
         viewBox="0 0 200 200"
-        className={`w-full h-full ${isZoomed ? 'drop-shadow-[2px_0_rgba(255,0,0,0.8)] drop-shadow-[-2px_0_rgba(0,255,255,0.8)]' : 'drop-shadow-[0_0_8px_rgba(0,255,65,0.4)]'}`}
+        className="w-full h-full drop-shadow-[0_0_8px_rgba(0,255,65,0.4)]"
         fill="none"
         stroke="#00FF41"
         strokeWidth="0.5"
@@ -20,7 +20,7 @@ const SigilGraphic: React.FC<{ isZoomed?: boolean }> = ({ isZoomed = false }) =>
         <circle cx="100" cy="100" r="85" strokeOpacity="0.2" />
 
         {/* Breathing Core Geometry */}
-        <g className="animate-[pulse_4s_ease-in-out_infinite]">
+        <g className="animate-[pulse_4s_ease-in-out_infinite] will-change-opacity">
             <polygon points="100,20 170,60 170,140 100,180 30,140 30,60" strokeWidth="1" strokeOpacity="0.8" />
             <polygon points="100,180 170,140 170,60 100,20 30,60 30,140" strokeWidth="0.5" strokeOpacity="0.3" transform="rotate(180 100 100)" />
             
@@ -39,40 +39,56 @@ const SigilGraphic: React.FC<{ isZoomed?: boolean }> = ({ isZoomed = false }) =>
         <line x1="180" y1="100" x2="200" y2="100" strokeOpacity="0.5" />
       </svg>
       
-      {/* Status Indicators with Targeting Logic (Only show on base layer) */}
-      {!isZoomed && (
-        <div className="absolute bottom-0 z-20">
-            <div className="target-hud text-[9px] tracking-[0.2em] text-[#00FF41]/60 bg-black px-2 py-1 border border-[#00FF41]/20">
-                ORACLE_SYS_ONLINE
-            </div>
-        </div>
-      )}
+      {/* Status Indicators */}
+      <div className="absolute bottom-0 z-20">
+          <div className="target-hud text-[9px] tracking-[0.2em] text-[#00FF41]/60 bg-black px-2 py-1 border border-[#00FF41]/20">
+              ORACLE_SYS_ONLINE
+          </div>
+      </div>
     </>
   );
 };
 
 const OracleSigil: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number>();
+  
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [coords, setCoords] = useState({ x: '00.00', y: '00.00' });
 
-  // Handle Mouse Movement
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    };
+  }, []);
+
+  // Handle Mouse Movement (Optimized with rAF)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
     
-    setMousePos({ x, y });
+    // Persist event values needed
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    const rect = containerRef.current.getBoundingClientRect();
 
-    // Calculate tactical coordinates relative to center (128x128 for a 256px box)
-    const centerX = 128;
-    const centerY = 128;
-    const normX = (x - centerX).toFixed(2);
-    const normY = -(y - centerY).toFixed(2); 
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
 
-    setCoords({ x: normX, y: normY });
+    animationFrameRef.current = requestAnimationFrame(() => {
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      
+      setMousePos({ x, y });
+
+      // Calculate tactical coordinates relative to center
+      const centerX = 128; // Half of 256
+      const centerY = 128;
+      const normX = (x - centerX).toFixed(2);
+      const normY = -(y - centerY).toFixed(2); 
+
+      setCoords({ x: normX, y: normY });
+    });
   };
 
   return (
@@ -84,42 +100,39 @@ const OracleSigil: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* --- LAYER 1: Base Content --- */}
-      <div className={`w-full h-full relative transition-opacity duration-300 ${isHovered ? 'opacity-50 blur-[1px]' : 'opacity-100'}`}>
+      <div className="w-full h-full relative">
          <SigilGraphic />
       </div>
 
-      {/* --- LAYER 2: Tactical Zoom Lens --- */}
-      <div 
-        className="absolute inset-0 pointer-events-none will-change-[clip-path]"
-        style={{
-          opacity: isHovered ? 1 : 0,
-          clipPath: `circle(75px at ${mousePos.x}px ${mousePos.y}px)`,
-          backgroundColor: '#000', 
-          zIndex: 10
-        }}
-      >
-        {/* Zoomed Content Wrapper */}
-        <div 
-           className="w-full h-full will-change-transform"
-           style={{
-             transformOrigin: `${mousePos.x}px ${mousePos.y}px`,
-             transform: 'scale(2)',
-           }}
-        >
-            <div className="relative w-full h-full">
-                <SigilGraphic isZoomed={true} />
-                {/* High frequency scanline flicker inside lens */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-50 bg-[length:100%_2px,3px_100%] pointer-events-none mix-blend-overlay animate-[pulse_0.1s_infinite]"></div>
-            </div>
-        </div>
-      </div>
-
-      {/* --- LAYER 3: Custom UI Overlay (Reticle & Coords) --- */}
+      {/* --- LAYER 2: Tactical Zoom Lens (Optimized via Backdrop Filter) --- */}
       {isHovered && (
         <>
-            {/* Custom Crosshair Cursor */}
+            {/* The Lens itself - No duplication, just filter */}
             <div 
-                className="absolute pointer-events-none z-50 flex items-center justify-center"
+                className="absolute pointer-events-none z-30 rounded-full border border-[#00FF41]/50 will-change-transform"
+                style={{
+                    left: mousePos.x,
+                    top: mousePos.y,
+                    width: '150px',
+                    height: '150px',
+                    transform: 'translate(-50%, -50%)',
+                    backdropFilter: 'brightness(1.2) contrast(1.2) saturate(1.5)',
+                    boxShadow: 'inset 0 0 20px rgba(0, 255, 65, 0.2), 0 0 10px rgba(0,0,0,0.5)'
+                }}
+            >
+               {/* High frequency scanline flicker inside lens */}
+               <div className="absolute inset-0 rounded-full bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] mix-blend-overlay animate-[pulse_0.1s_infinite]"></div>
+               
+               {/* Decorative Ticks on Lens */}
+               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-2 bg-[#00FF41]"></div>
+               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1px] h-2 bg-[#00FF41]"></div>
+               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-[1px] bg-[#00FF41]"></div>
+               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-[1px] bg-[#00FF41]"></div>
+            </div>
+
+            {/* Custom Crosshair Cursor Center */}
+            <div 
+                className="absolute pointer-events-none z-50 flex items-center justify-center will-change-transform"
                 style={{
                     left: mousePos.x,
                     top: mousePos.y,
@@ -137,36 +150,17 @@ const OracleSigil: React.FC = () => {
 
             {/* Dynamic Coordinates floating near cursor */}
             <div 
-                className="absolute z-50 pointer-events-none whitespace-nowrap"
+                className="absolute z-50 pointer-events-none whitespace-nowrap will-change-transform"
                 style={{
-                    left: mousePos.x + 30,
-                    top: mousePos.y + 30,
+                    left: mousePos.x + 40,
+                    top: mousePos.y + 40,
                 }}
             >
                 <div className="flex flex-col text-[8px] font-mono leading-tight bg-black/90 p-1.5 border-l-2 border-[#00FF41] shadow-[4px_4px_0px_rgba(0,255,65,0.2)]">
                     <span className="text-[#00FF41] font-bold">X: {coords.x}</span>
                     <span className="text-[#FF003C] font-bold">Y: {coords.y}</span>
-                    <span className="text-[#00FF41]/50 mt-1 tracking-wider">MAG: 200%</span>
+                    <span className="text-[#00FF41]/50 mt-1 tracking-wider">MAG: DIGITAL</span>
                 </div>
-            </div>
-
-            {/* Lens Border Ring */}
-            <div 
-                className="absolute z-40 pointer-events-none rounded-full border border-[#00FF41]/30"
-                style={{
-                    width: '150px',
-                    height: '150px',
-                    left: mousePos.x,
-                    top: mousePos.y,
-                    transform: 'translate(-50%, -50%)',
-                    boxShadow: 'inset 0 0 20px rgba(0, 255, 65, 0.1)'
-                }}
-            >
-                {/* Decorative Ticks */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-2 bg-[#00FF41]"></div>
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1px] h-2 bg-[#00FF41]"></div>
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-[1px] bg-[#00FF41]"></div>
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-[1px] bg-[#00FF41]"></div>
             </div>
         </>
       )}

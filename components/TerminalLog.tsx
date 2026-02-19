@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 
-interface LogEntry {
+export interface LogEntry {
   id: string;
   type: string;
   content: string;
@@ -12,13 +12,6 @@ interface TerminalLogProps {
 }
 
 const TerminalLog: React.FC<TerminalLogProps> = ({ logs = [] }) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll when new real logs come in
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [logs]);
-
   return (
     <div className="w-full font-mono text-sm leading-relaxed border-l-2 border-[#00FF41]/20 pl-4 py-2 min-h-[100px]">
       <div className="text-[#00FF41]/40 mb-4 text-xs tracking-widest uppercase">
@@ -39,7 +32,6 @@ const TerminalLog: React.FC<TerminalLogProps> = ({ logs = [] }) => {
           </div>
         ))
       )}
-      <div ref={bottomRef} />
     </div>
   );
 };
