@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 const TerminalLog: React.FC = () => {
-  const [logs, setLogs] = useState<string[]>(['> SEARCHING_FOR_SIGNAL...']);
+  const [logs, setLogs] = useState<string[]>(['> WAITING_FOR_CORE_SIGNAL...']);
   const [alertActive, setAlertActive] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +52,7 @@ const TerminalLog: React.FC = () => {
 
         setLogs(prev => {
             // Remove initial search signal if it exists
-            const cleanPrev = prev.filter(l => l !== '> SEARCHING_FOR_SIGNAL...');
+            const cleanPrev = prev.filter(l => l !== '> WAITING_FOR_CORE_SIGNAL...');
             
             // Deduplication (last 50)
             const recent = new Set(cleanPrev.slice(-50));
@@ -61,7 +61,7 @@ const TerminalLog: React.FC = () => {
             // If no new unique entries, do not update (avoids flicker/re-renders)
             if (unique.length === 0) {
                 // If we are still searching, return prev to keep the searching message
-                return prev.length === 1 && prev[0] === '> SEARCHING_FOR_SIGNAL...' ? prev : cleanPrev;
+                return prev.length === 1 && prev[0] === '> WAITING_FOR_CORE_SIGNAL...' ? prev : cleanPrev;
             }
             
             return [...cleanPrev, ...unique].slice(-100);
@@ -78,7 +78,7 @@ const TerminalLog: React.FC = () => {
     const handleUplink = () => {
       setAlertActive(true);
       setLogs(prev => {
-          const cleanPrev = prev.filter(l => l !== '> SEARCHING_FOR_SIGNAL...');
+          const cleanPrev = prev.filter(l => l !== '> WAITING_FOR_CORE_SIGNAL...');
           return [...cleanPrev, "> SIGNAL_INTERCEPTED: AWAITING ORACLE OVERRIDE IN THE WAR ROOM..."];
       });
       setTimeout(() => setAlertActive(false), 2000);
