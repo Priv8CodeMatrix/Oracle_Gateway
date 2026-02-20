@@ -156,6 +156,11 @@ const App: React.FC = () => {
             {uplinkStatus === 'INITIATED' && 'Handshake...'}
             {uplinkStatus === 'CONNECTED' && 'Access Granted'}
           </button>
+
+          {/* Human Verification Option */}
+          <div className="text-center text-[10px] text-[#008F11] font-mono uppercase tracking-[0.2em] opacity-80 select-none">
+             [ HUMAN VERIFICATION OPTION ]
+          </div>
           
           <div className="text-center text-xs text-[#00FF41]/50 uppercase tracking-widest flex flex-col gap-1">
             <span className="hover:text-white cursor-crosshair">Secure Connection Required</span>
