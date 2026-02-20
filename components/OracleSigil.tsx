@@ -51,7 +51,7 @@ const SigilGraphic: React.FC = () => {
 
 const OracleSigil: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number>(0);
   
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -85,7 +85,7 @@ const OracleSigil: React.FC = () => {
       const centerX = 128; // Half of 256
       const centerY = 128;
       const normX = (x - centerX).toFixed(2);
-      const normY = -(y - centerY).toFixed(2); 
+      const normY = (-(y - centerY)).toFixed(2); 
 
       setCoords({ x: normX, y: normY });
     });
