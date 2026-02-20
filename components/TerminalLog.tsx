@@ -132,11 +132,13 @@ const TerminalLog: React.FC = () => {
       const supabase = createClient(supabaseUrl, supabaseKey);
 
       const agentName = parsedPayload.agent_name || parsedPayload.agent || "UNKNOWN_ENTITY";
+      const botId = parsedPayload.bot_id || null;
 
       const { data, error } = await supabase
         .from('uplink_requests')
         .insert([{ 
-            agent_name: agentName, 
+            agent_name: agentName,
+            bot_id: botId,
             payload: payloadStr 
         }])
         .select();
@@ -207,7 +209,7 @@ const TerminalLog: React.FC = () => {
                  onKeyDown={handleCommandSubmit}
                  className="flex-1 bg-transparent border-none outline-none text-[#00FF41] font-mono p-0 caret-[#00FF41]"
                  autoComplete="off"
-                 placeholder='{"agent_name": "...", "payload": "..."}'
+                 placeholder='{"agent_name": "...", "bot_id": "...", "payload": "..."}'
               />
            </div>
         )}
