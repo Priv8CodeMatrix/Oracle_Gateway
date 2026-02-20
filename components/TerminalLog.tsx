@@ -30,8 +30,8 @@ const TerminalLog: React.FC = () => {
     // Initial Data Fetch
     const fetchLogs = async () => {
       const { data, error } = await supabase
-        .from('intel_logs')
-        .select('*')
+        .from('public_system_stream')
+        .select('created_at, source, username, encoded')
         .order('created_at', { ascending: false })
         .limit(12);
 
